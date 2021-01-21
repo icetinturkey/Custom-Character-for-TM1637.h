@@ -1,7 +1,7 @@
 # Adding Custom Character to Grove 4-Digit Display
 ## 1) Find true hexadecimal character code;
 ###### ![Image](http://ismailce.com/Download/tm1637_2.jpg)
-###### You can using 'https://www.rapidtables.com/convert/number/binary-to-hex.html' for char's decimal to hexadecimal.
+###### You can using 'https://www.rapidtables.com/convert/number/binary-to-hex.html' for convert char's decimal to hexadecimal.
 ## 2) Add hexadecimal character code to library;
 ###### Go and edit; \Arduino\libraries\Grove_4-Digit_Display\TM1637.cpp
 ###### ![Image](http://ismailce.com/Download/tm1637_1.jpg)
