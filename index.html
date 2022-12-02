@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Editor</title>
+<style>
+*, ::before, ::after {box-sizing: border-box;margin:0;padding:0;}
+*:focus-visible {outline:0;}
+.container{width:90%;margin:0 auto;display:flex;flex-direction:row;margin-top:10px;}
+.ldiv{width:40%;}
+.rdiv{width:60%;display:flex;flex-direction:column;justify-content:center;}
+button{cursor:pointer;padding:5px;margin-top:4px;}
+.styled, .styled > thead > tr > td, .styled > tbody > tr > td{border: 1px solid;border-collapse: collapse;padding-left:15px;padding-right:15px;padding-top:5px;padding-bottom:5px;}
+thead {background-color: #04AA6D;color: #fff;}
+.styled > tbody > tr:hover {background-color: gray;cursor:pointer;}
+@media screen and (max-width : 540px) {
+.container {width:98%;flex-direction:column;}
+.ldiv,.rdiv{width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="ldiv">
+	<div style="width:120px;height:30px;margin-left:30px;cursor:pointer;" id="s7" onclick="screen(7)"></div>
+	<div>
+		<div style="height:120px;width:30px;float:left;cursor:pointer;" id="s2" onclick="screen(2)"></div>
+		<div style="height:120px;width:30px;float:left;margin-left:120px;cursor:pointer;" id="s6" onclick="screen(6)"></div>
+	</div>
+	<div style="clear: both;"></div>
+	<div style="width:120px;height:30px;margin-left:30px;cursor:pointer;" id="s1" onclick="screen(1)"></div>
+	<div>
+		<div style="height:120px;width:30px;float:left;cursor:pointer;" id="s3" onclick="screen(3)"></div>
+		<div style="height:120px;width:30px;float:left;margin-left:120px;cursor:pointer;" id="s5" onclick="screen(5)"></div>
+	</div>
+	<div style="clear: both;"></div>
+	<div style="width:120px;height:30px;margin-left:30px;cursor:pointer;" id="s4" onclick="screen(4)"></div>
+	<br/>
+	<table>
+	<tr>
+	<td>Selected:</td>
+	<td><input type="text" id="textBox1" disabled/></td>
+	</tr>
+	<tr>
+	<td>Binary:</td>
+	<td><input type="text" id="textBox2" disabled/></td>
+	</tr>
+	<tr>
+	<td>Hex:</td>
+	<td><input type="text" id="textBox3" disabled/></td>
+	</tr>
+	<tr>
+	<td><button type="button" onclick="rotate_btn()">Rotate 180</button></td>
+	<td><button type="button" onclick="save_btn()">Save</button></td>
+	</tr>
+	</table>
+</div>
+<div class="rdiv">
+	<table class="styled">
+	<thead>
+	<tr>
+	<td>id</td>
+	<td>code</td>
+	</tr>
+	</thead>
+	<tbody id="tbody">
+	<tr>
+	<td>asd</td>
+	<td>code</td>
+	</tr>
+	</tbody>
+	</table>
+	<button type="button" onclick="create_btn()">Create New Character</button>
+	<button type="button" onclick="remove_btn()">Remove Last Character</button>
+	<button type="button" onclick="export_btn()" style="font-weight:bold">Export File</button>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+let characters = ["0x3f","0x06","0x5b","0x4f","0x66","0x6d","0x7d","0x07","0x7f","0x6f","0x77","0x7c","0x39","0x5e","0x79","0x71"];
+let changed = [];
+let sectors = ["0", "0", "0", "0", "0", "0", "0", "0"];
+let currentIndex = 0;
+document.addEventListener("DOMContentLoaded", function() {
+	selectChar(0);
+});
+function draw(){
+	for(i=1;i<sectors.length;i++){
+		if(sectors[i]=="0"){
+		document.getElementById('s'+i).style.backgroundColor = "pink";
+		}else{
+		document.getElementById('s'+i).style.backgroundColor = "red";
+		}
+	}
+	////////////////////TEXTBOXS DRAWING///////////////////
+	document.getElementById('textBox2').value = "0";
+	for(i=1;i<sectors.length;i++){
+		document.getElementById('textBox2').value +=sectors[i];
+	}
+	document.getElementById('textBox3').value = "0x"+bin2hex(document.getElementById('textBox2').value);
+	/////////////////////TABLE DRAWING/////////////////////
+	document.getElementById('tbody').innerHTML = "";
+	for(i=0;i<characters.length;i++){
+		let newChar="<tr onclick='selectChar(\""+i+"\")'><td>"+i+"</td><td>"+characters[i]+"</td></tr>";
+		for(a=0;a<changed.length;a++){
+			if(changed[a]==i){
+				newChar="<tr onclick='selectChar(\""+i+"\")'><td>"+i+"</td><td><b>"+characters[i]+"</b></td></tr>";
+			}
+		}
+		document.getElementById('tbody').innerHTML +=newChar;
+	}
+}
+function screen(sector){
+	let current = sectors[sector];
+	if(current=="0"){
+		sectors[sector]="1";
+	}else{
+		sectors[sector]="0";
+	}
+	draw();
+}
+function selectChar(index){
+currentIndex = index;
+document.getElementById('textBox1').value = index;
+let binaryText = hex2bin(characters[index].substr(2));
+for(i=0;i<sectors.length;i++){
+	sectors[i]=binaryText[i];
+}
+draw();
+}
+function save_btn(){
+let index = document.getElementById('textBox1').value;
+characters[index]=document.getElementById('textBox3').value;
+let notFound = true;
+if(changed.length>0){
+for(i=0;i<changed.length;i++){
+if(index==changed[i]){
+notFound=false;
+}
+}
+}
+if(notFound){
+changed.push(index);
+}
+draw();
+}
+function rotate_btn(){
+let current = document.getElementById('textBox2').value;
+let sonuc = rotate180(current);
+for(i=0;i<sonuc.length;i++){
+sectors[i]=sonuc[i];
+}
+draw();
+}
+function rotate180(binary){
+	let b = [];
+	let bCopy = [];
+	for (i = 0; i < binary.length; i++) {
+		b[i] = binary[i];
+		bCopy[i] = binary[i];
+	}
+	b[2]=bCopy[5];
+	b[3]=bCopy[6];
+	b[4]=bCopy[7];
+	b[5]=bCopy[2];
+	b[6]=bCopy[3];
+	b[7]=bCopy[4];
+	return b;
+}
+function create_btn(){
+	characters.push("0x00");
+	draw();
+}
+function remove_btn(){
+	characters.pop();
+	draw();
+}
+function export_btn(){
+let finalString = "";
+let first = true;
+for (i = 0; i < characters.length; i++) {
+if(first){
+first=false;
+finalString += characters[i];
+}else{
+finalString += ","+characters[i];
+}
+}
+saveStaticDataToFile(finalString);
+}
+function saveStaticDataToFile(datas) {
+const s0 = '#include "TM1637.h"\n#include <Arduino.h>\nstatic int8_t TubeTab[] = {'+datas+'};\nTM1637::TM1637(uint8_t Clk, uint8_t Data){Clkpin = Clk;Datapin = Data;pinMode(Clkpin,OUTPUT);pinMode(Datapin,OUTPUT);}\nvoid TM1637::init(void){clearDisplay();}\n'
+const s1 = 'int TM1637::writeByte(int8_t wr_data){uint8_t i,count1;for(i=0;i<8;i++){digitalWrite(Clkpin,LOW);if(wr_data & 0x01){digitalWrite(Datapin,HIGH);}else{digitalWrite(Datapin,LOW);}wr_data >>= 1;digitalWrite(Clkpin,HIGH);}digitalWrite(Clkpin,LOW);digitalWrite(Datapin,HIGH);digitalWrite(Clkpin,HIGH);pinMode(Datapin,INPUT);bitDelay();uint8_t ack = digitalRead(Datapin);if(ack == 0){pinMode(Datapin,OUTPUT);digitalWrite(Datapin,LOW);}bitDelay();pinMode(Datapin,OUTPUT);bitDelay();return ack;}\n'
+const s2 = 'void TM1637::start(void){digitalWrite(Clkpin,HIGH);digitalWrite(Datapin,HIGH);digitalWrite(Datapin,LOW);digitalWrite(Clkpin,LOW);}\nvoid TM1637::stop(void){digitalWrite(Clkpin,LOW);digitalWrite(Datapin,LOW);digitalWrite(Clkpin,HIGH);digitalWrite(Datapin,HIGH);}\nvoid TM1637::display(int8_t DispData[]){int8_t SegData[4];uint8_t i;for(i = 0;i < 4;i ++){SegData[i] = DispData[i];}coding(SegData);start();writeByte(ADDR_AUTO);stop();start();writeByte(Cmd_SetAddr);for(i=0;i < 4;i ++){writeByte(SegData[i]);}stop();start();writeByte(Cmd_DispCtrl);stop();}\n'
+const s3 = 'void TM1637::display(uint8_t BitAddr,int8_t DispData){int8_t SegData;SegData = coding(DispData);start();writeByte(ADDR_FIXED);stop();start();writeByte(BitAddr|0xc0);writeByte(SegData);stop();start();writeByte(Cmd_DispCtrl);stop();}\nvoid TM1637::clearDisplay(void){display(0x00,0x7f);display(0x01,0x7f);display(0x02,0x7f);display(0x03,0x7f);}\nvoid TM1637::set(uint8_t brightness,uint8_t SetData,uint8_t SetAddr){Cmd_SetData = SetData;Cmd_SetAddr = SetAddr;Cmd_DispCtrl = 0x88 + brightness;}\n'
+const s4 = 'void TM1637::point(boolean PointFlag){_PointFlag = PointFlag;}\nvoid TM1637::coding(int8_t DispData[]){uint8_t PointData;if(_PointFlag == POINT_ON){PointData = 0x80;}else{PointData = 0;}for(uint8_t i = 0;i < 4;i ++){if(DispData[i] == 0x7f){DispData[i] = 0x00;}else{DispData[i] = TubeTab[DispData[i]] + PointData;}}}\nint8_t TM1637::coding(int8_t DispData){uint8_t PointData;if(_PointFlag == POINT_ON){PointData = 0x80;}else{PointData = 0;}if(DispData == 0x7f){DispData = 0x00 + PointData;}else{DispData = TubeTab[DispData] + PointData;}return DispData;}\nvoid TM1637::bitDelay(void){delayMicroseconds(50);}\n'
+let blob = new Blob([s0+s1+s2+s3+s4],{ type: "text/plain;charset=utf-8" });
+saveAs(blob, "TM1637.cpp");
+}
+function hex2bin(hex) {
+  let bin = "";
+  let bitsInHex = 4;
+  Array.from(hex).forEach(
+    function (char) {
+      let currentBin = parseInt(char, 16).toString(2);
+      if (currentBin.length < bitsInHex) {
+        let padding = "0".repeat(bitsInHex-currentBin.length);
+        currentBin = padding + currentBin;
+      }
+      bin += currentBin;
+    }
+  );
+  return bin;
+}
+function bin2hex(bin) {
+  let hex = "";
+  let bitsInHex = 4;
+  for (let i = 0; i < bin.length; i = i + bitsInHex) {
+    let eightBits = bin.substr(i, bitsInHex);
+    let currentHex = (parseInt(eightBits, 2)).toString(16).toUpperCase();
+    hex += currentHex;
+  }
+  return hex;
+}
+</script>
+</body>
+</html>
