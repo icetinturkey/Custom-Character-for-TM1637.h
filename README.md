@@ -3,7 +3,7 @@
 #
 ### How to add new character;
 1) Install Grove 4-Digit Display Library.
-![Image](https://lh3.googleusercontent.com/drive-viewer/AFDK6gNLk00Faluyg2zrX2H5Q5nZhB10nfOB0sDBJbJTYz6538h8ZYRYlxghFGDIA5NLPBWu0QDardU6KT9wnH7ZEb1Gwhbc=w1504-h607)
+##### ![Image](https://lh3.googleusercontent.com/drive-viewer/AFDK6gNLk00Faluyg2zrX2H5Q5nZhB10nfOB0sDBJbJTYz6538h8ZYRYlxghFGDIA5NLPBWu0QDardU6KT9wnH7ZEb1Gwhbc=w1504-h607)
 2) [`Go character editor`](https://icetinturkey.github.io/Custom-Character-for-TM1637.h) and click 'Create New Character'
 3) Select option 16 in the panel on the right.
 4) Draw the character you want by clicking on the sectors and click 'Save'.
