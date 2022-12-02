@@ -14,7 +14,7 @@ Draw the character you want by clicking on the sectors and click 'Save'.
 
 Download the new library file by pressing the 'Export File' button.
 
-Replace C:\Users\{Username}\Documents\Arduino\libraries\Grove_4-Digit_Display\TM1637.cpp with the file you just downloaded.
+Replace C:\Users\\{Username}\Documents\Arduino\libraries\Grove_4-Digit_Display\TM1637.cpp with the file you just downloaded.
 
 #
 ### How to use my new character (In the example above: 16)
