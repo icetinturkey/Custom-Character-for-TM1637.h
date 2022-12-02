@@ -1,4 +1,4 @@
-# [Arduino] Character Editor for TM1637 Display Library
+[Arduino] Character Editor for TM1637 Display Library
 
 ### [https://icetinturkey.github.io/Custom-Character-for-TM1637.h](https://icetinturkey.github.io/Custom-Character-for-TM1637.h)
 #
